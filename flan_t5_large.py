@@ -145,7 +145,7 @@ outputs = model.generate(input_ids = inputs.input_ids,
 
 # 使用模型解码输出
 # print('Output: ', tokenizer.decode(outputs[0], skip_special_tokens=True))
-generated_text = tokenizer.decode(outputs.sequences, skip_special_tokens=True)
+generated_text = tokenizer.decode(outputs.sequences[0], skip_special_tokens=True)
 generated_text = generated_text.replace("_", " ")
 # generated_text = generated_text.replace("<", 4*" ")
 # generated_text = generated_text.replace("<", "\t")
