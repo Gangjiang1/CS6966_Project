@@ -8,8 +8,9 @@ model_checkpoint = "google/flan-t5-large"
 
 from datasets import load_dataset
 
-raw_datasets = load_dataset("json", data_files="10.17_geo_explain_1w.json")
-
+#raw_datasets = load_dataset("json", data_files="10.17_geo_explain_1w.json")
+raw_datasets = load_dataset("json", data_files="11.3_geo_load_1w.json")
+test_datasets = load_dataset("json", data_files="11.3_geo_load_100_test.json")
 print (raw_datasets)
 
 print (raw_datasets["train"][0])
@@ -63,22 +64,22 @@ def preprocess_function(examples):
 # 这里 将输出做了处理，然后也添加到了 input中
 
 tokenized_datasets = raw_datasets.map(preprocess_function, batched=True)
+tokenized_test_datasets = test_datasets.map(preprocess_function, batched=True)
+print(tokenized_datasets)
+print(tokenized_test_datasets)
 
-tokenized_datasets
-
-
-batch_size = 1
+batch_size = 5
 model_name = model_checkpoint.split("/")[-1]
 args = Seq2SeqTrainingArguments(
-    f"{model_name}-finetuned-e+",
+    f"{model_name}_Eplus-LLM",
     # evaluation_strategy = "epoch",
-    learning_rate=2e-5,
+    learning_rate=1e-5,
     per_device_train_batch_size=batch_size,
     # per_device_eval_batch_size=batch_size,
     weight_decay=0,
     # save_strategy="no",
     save_total_limit=1,  
-    num_train_epochs=1,
+    num_train_epochs=5,
     predict_with_generate=True,
     fp16=False,
 )
@@ -104,7 +105,9 @@ trainer = Seq2SeqTrainer(
 print ("Parameters:",'name:flan t5 large','dataset:1w_explain','token size:', token_count,'epochs:', 1, 'batch size:', batch_size)
 trainer.train()
 # 准备测试文本
-small_test_dataset = tokenized_datasets["train"].shuffle(seed=42).select(range(1))
+small_test_dataset = tokenized_test_datasets["train"].shuffle(seed=142).select(range(1))
+
+# small_test_dataset = tokenized_datasets["train"].shuffle(seed=42).select(range(1))
 test_prompt = small_test_dataset['Prompt']
 print ('Test prompt: ', test_prompt)
 test_idf = small_test_dataset["Idf"]
@@ -140,14 +143,18 @@ outputs = model.generate(input_ids = inputs.input_ids,
 generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
 generated_text = generated_text.replace("_", " ")
 # generated_text = generated_text.replace("<", 4*" ")
-generated_text = generated_text.replace("<", "\t")
+# generated_text = generated_text.replace("<", "\t")
 generated_text = generated_text.replace("|", "\n")
 print("Generated_text>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 print(generated_text)
 
 # 打开一个文本文件用于写入，如果文件不存在则创建它
-with open("generated_flan_t5_large.txt", "w") as file:
+with open("generated_flan_t5_large_with load.txt", "w") as file:
     # 将生成的文本写入文件
+    #file.write(input_text)
+    # file.write('\n')
+    # file.write('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+    # file.write('\n')
     file.write(generated_text)
 
 print("Generated text saved to generated_text.txt")
