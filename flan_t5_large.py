@@ -9,7 +9,9 @@ model_checkpoint = "google/flan-t5-large"
 from datasets import load_dataset
 
 #raw_datasets = load_dataset("json", data_files="10.17_geo_explain_1w.json")
-raw_datasets = load_dataset("json", data_files="11.3_geo_load_1w.json")
+# raw_datasets = load_dataset("json", data_files="11.3_geo_load_1w.json")
+raw_datasets = load_dataset("json", data_files="11.3_geo_load_100_test.json")
+
 test_datasets = load_dataset("json", data_files="11.3_geo_load_100_test.json")
 print (raw_datasets)
 
@@ -18,10 +20,12 @@ print (raw_datasets["train"][0])
 from transformers import AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1, 2, 3"
-model = AutoModelForSeq2SeqLM.from_pretrained(model_checkpoint)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_checkpoint, output_attentions=True)
 
 from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
+
+from bertviz import model_view
 
 
 # new_tokens = ['\n', ' ']
@@ -79,7 +83,7 @@ args = Seq2SeqTrainingArguments(
     weight_decay=0,
     # save_strategy="no",
     save_total_limit=1,  
-    num_train_epochs=5,
+    num_train_epochs=10,
     predict_with_generate=True,
     fp16=False,
 )
@@ -147,6 +151,18 @@ generated_text = generated_text.replace("_", " ")
 generated_text = generated_text.replace("|", "\n")
 print("Generated_text>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 print(generated_text)
+
+
+from bertviz import model_view
+model_view(
+    encoder_attention=outputs.encoder_attentions,
+    decoder_attention=outputs.decoder_attentions,
+    cross_attention=outputs.cross_attentions,
+    encoder_tokens= input_text,
+    decoder_tokens = generated_text
+)
+
+
 
 # 打开一个文本文件用于写入，如果文件不存在则创建它
 with open("generated_flan_t5_large_with load.txt", "w") as file:
