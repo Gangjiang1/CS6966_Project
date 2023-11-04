@@ -20,7 +20,7 @@ print (raw_datasets["train"][0])
 from transformers import AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1, 2, 3"
-model = AutoModelForSeq2SeqLM.from_pretrained(model_checkpoint, output_attentions=True)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_checkpoint)
 
 from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
@@ -140,7 +140,8 @@ inputs = tokenizer(input_text, return_tensors="pt", padding=True, truncation=Fal
 outputs = model.generate(input_ids = inputs.input_ids,
                            attention_mask = inputs.attention_mask,
                            generation_config = generation_config,
-                           return_dict_in_generate=True, output_scores=True
+                           return_dict_in_generate=True, output_scores=True,
+                           output_attentions=True,
                            )
 
 # 使用模型解码输出
@@ -156,8 +157,8 @@ print(generated_text)
 
 from bertviz import model_view
 model_view(
-    encoder_attention=encoder_attentions,
-    decoder_attention=decoder_attentions,
+    encoder_attention=outputs.encoder_attentions,
+    decoder_attention=outputs.decoder_attentions,
     cross_attention=outputs.cross_attentions,
     encoder_tokens= input_text,
     decoder_tokens = generated_text
