@@ -145,7 +145,7 @@ outputs = model.generate(input_ids = inputs.input_ids,
 
 # 使用模型解码输出
 # print('Output: ', tokenizer.decode(outputs[0], skip_special_tokens=True))
-generated_text = tokenizer.decode(outputs.sequences[0], skip_special_tokens=True)
+generated_text = tokenizer.decode(outputs[0][0], skip_special_tokens=True)
 generated_text = generated_text.replace("_", " ")
 # generated_text = generated_text.replace("<", 4*" ")
 # generated_text = generated_text.replace("<", "\t")
@@ -156,8 +156,8 @@ print(generated_text)
 
 from bertviz import model_view
 model_view(
-    encoder_attention=outputs.encoder_attentions,
-    decoder_attention=outputs.decoder_attentions,
+    encoder_attention=encoder_attentions,
+    decoder_attention=decoder_attentions,
     cross_attention=outputs.cross_attentions,
     encoder_tokens= input_text,
     decoder_tokens = generated_text
