@@ -139,7 +139,8 @@ inputs = tokenizer(input_text, return_tensors="pt", padding=True, truncation=Fal
 # 使用模型预测
 outputs = model.generate(input_ids = inputs.input_ids,
                            attention_mask = inputs.attention_mask,
-                           generation_config = generation_config
+                           generation_config = generation_config,
+                           return_dict_in_generate=True, output_scores=True
                            )
 
 # 使用模型解码输出
