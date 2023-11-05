@@ -172,9 +172,9 @@ print(generated_text)
 
 from bertviz import model_view
 model_view(
-    encoder_attention=outputs.encoder_attentions,
-    decoder_attention=outputs.decoder_attentions,
-    cross_attention=outputs.cross_attentions,
+    encoder_attention=output_model.encoder_attentions,
+    decoder_attention=output_model.decoder_attentions,
+    cross_attention=output_model.cross_attentions,
     encoder_tokens= encoder_text,
     decoder_tokens = decoder_text
 )
