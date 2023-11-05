@@ -20,7 +20,7 @@ print (raw_datasets["train"][0])
 from transformers import AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq, Seq2SeqTrainingArguments, Seq2SeqTrainer
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1, 2, 3"
-model = AutoModelForSeq2SeqLM.from_pretrained(model_checkpoint)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_checkpoint,output_attentions=True)
 
 from transformers import AutoTokenizer
 tokenizer = AutoTokenizer.from_pretrained(model_checkpoint)
@@ -151,7 +151,7 @@ decoded_output = tokenizer.decode(outputs[0][0], skip_special_tokens=True)
 with tokenizer.as_target_tokenizer():
     decoder_input_ids = tokenizer(decoded_output, return_tensors="pt").input_ids.to(device)
 
-output_model = model(input_ids=inputs.input_ids,decoder_input_ids=decoder_input_ids)
+output_model = model(input_ids=inputs.input_ids,decoder_input_ids=decoder_input_ids,output_attentions=True)
 
 encoder_text = tokenizer.convert_ids_to_tokens(inputs.input_ids[0])
 decoder_text = tokenizer.convert_ids_to_tokens(decoder_input_ids[0])
