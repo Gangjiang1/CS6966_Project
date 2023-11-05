@@ -145,8 +145,8 @@ outputs = model.generate(input_ids = inputs.input_ids,
                            )
 
 decoded_output = ""
-for output_slice in outputs:
-    decoded_output += tokenizer.decode(output_slice, skip_special_tokens=True)
+
+decoded_output = tokenizer.decode(outputs[0][0], skip_special_tokens=True)
 
 with tokenizer.as_target_tokenizer():
     decoder_input_ids = tokenizer(decoded_output, return_tensors="pt").input_ids.to(device)
