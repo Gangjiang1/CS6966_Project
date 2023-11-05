@@ -176,7 +176,8 @@ model_view(
     decoder_attention=output_model.decoder_attentions,
     cross_attention=output_model.cross_attentions,
     encoder_tokens= encoder_text,
-    decoder_tokens = decoder_text
+    decoder_tokens = decoder_text,
+    include_layers=[5, 6],
 )
 
 
