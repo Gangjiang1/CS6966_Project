@@ -144,6 +144,21 @@ outputs = model.generate(input_ids = inputs.input_ids,
                            output_attentions=True,
                            )
 
+decoded_output = ""
+for output_slice in outputs:
+    decoded_output += tokenizer.decode(output_slice, skip_special_tokens=True)
+
+with tokenizer.as_target_tokenizer():
+    decoder_input_ids = tokenizer(decoded_output, return_tensors="pt").input_ids.to(device)
+
+output_model = model(input_ids=inputs.input_ids,decoder_input_ids=decoder_input_ids)
+
+encoder_text = tokenizer.convert_ids_to_tokens(inputs.input_ids[0])
+decoder_text = tokenizer.convert_ids_to_tokens(decoder_input_ids[0])
+
+
+
+
 # 使用模型解码输出
 # print('Output: ', tokenizer.decode(outputs[0], skip_special_tokens=True))
 generated_text = tokenizer.decode(outputs[0][0], skip_special_tokens=True)
@@ -160,8 +175,8 @@ model_view(
     encoder_attention=outputs.encoder_attentions,
     decoder_attention=outputs.decoder_attentions,
     cross_attention=outputs.cross_attentions,
-    encoder_tokens= input_text,
-    decoder_tokens = generated_text
+    encoder_tokens= encoder_text,
+    decoder_tokens = decoder_text
 )
 
 
